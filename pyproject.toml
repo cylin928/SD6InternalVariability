@@ -1,5 +1,5 @@
 [project]
-name = "env_hetero_impact_gw"
+name = "sd6internalvariability"
 version = "1.0.0"
 authors = [
     {name = "Chung-Yi Lin", email = "philip928lin@gmail.com"}
