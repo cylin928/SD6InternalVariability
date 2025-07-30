@@ -126,4 +126,5 @@ df_sys_all = pd.concat(dfs_sys).reset_index(drop=True)
 # df_sys_all["CoPr"] = df_sys_all.groupby(["Co", "Pr"]).ngroup()
 # df_sys_all["PrCrCo"] = df_sys_all.groupby(["Pr", "Cr", "Co"]).ngroup()
 
-df_sys_all.to_csv(pn.outputs.ANOVA.get()/"df_sys_all.csv", index=False)
+df_sys_all.to_parquet(pn.outputs.ANOVA.get()/"df_sys_all.parquet")
+#df_sys_all.to_csv(pn.outputs.ANOVA.get()/"df_sys_all.csv", index=False)

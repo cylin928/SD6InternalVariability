@@ -15,7 +15,7 @@ factors_ = [
     "Precipitation",
     "Crop price",
     "Initial ratio of\ncorn fields",
-    r'Initial well' + '\n' + 'characteristics',#'\n'+r'($\bar{B}$)',
+    'Initial well' + '\n' + 'characteristics',#'\n'+r'($\bar{B}$)',
     ]
 
 # Create the figure and axis

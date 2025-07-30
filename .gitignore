@@ -15,6 +15,7 @@ __pycache__/
 # log
 log/
 outputs/exp4_ANOVA/
+outputs/ANOVA/df_sys_all.csv
 
 # temp data
 data/GMD4_data/CropScape/
