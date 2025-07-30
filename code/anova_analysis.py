@@ -8,12 +8,10 @@ pn.code.chdir()
 from anova_utils import (
     get_sum_sq_over_years,
     get_mu_sd_dfs_over_seeds,
-    plot_anova_sum_sq_fraction,
-    plot_anova_sum_sq,
-    plot_regime_comparison
     )
 # Collected simulated results
 df_sys_all = pd.read_csv(pn.outputs.ANOVA.get("df_sys_all.csv"))
+df_sys_all.to_parquet(pn.outputs.ANOVA.get()/"df_sys_all.parquet")
 vlist = ['ST', 'CF', 'Wi', 'CSC']
 #%% Compute ANONA over seeds
 mu_dict_all = {}
