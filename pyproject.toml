@@ -1,0 +1,30 @@
+[project]
+name = "env_hetero_impact_gw"
+version = "1.0.0"
+authors = [
+    {name = "Chung-Yi Lin", email = "philip928lin@gmail.com"}
+]
+license = { file = "LICENSE" }
+description = "file: README.md"
+dependencies = [
+    "seaborn",
+    "SALib",
+    "pathnavigator"
+    ]
+
+[project.optional-dependencies]
+dev = [
+    "ipython",
+]
+lint = [
+    "pre-commit>=2.20.0",
+]
+
+# tools
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312"]
+
+[tool.style-files]
+args = ["--style_pkg=styler", "--style_fun=styler::tidyverse_style"]
+files = "\\.R$"
