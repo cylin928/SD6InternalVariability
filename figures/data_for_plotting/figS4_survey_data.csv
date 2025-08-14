@@ -1,0 +1,81 @@
+state,version,finished,farm_role,farm_role_other_text,plant_cropprice,plant_inputprice,plant_labortime,plant_weather,plant_surfacew,plant_wlevel,plant_knowledge,plant_sustainability,plant_equipment,plant_risk,plant_buyer,plant_neighbor,plant_rotation,plant_soil,plant_other,plant_other_text,plant_depend
+CO,CO1,True,Owner,,9,8,7,5,9,10,10,9,10,5,8,1,9,8,,,Farm is oriented for hay/forage/aftermath grazing.
+CO,CO1,True,Owner,,,,,,,,,,,,,,,,,I let the fellows who rent our land make their own choices,
+CO,CO1,True,Owner,,5,9,2,6,10,4,7,1,,8,,,,3,,,
+CO,CO1,True,Owner,,3,2,6,1,1,1,7,1,9,1,5,1,1,8,,,alfalfa lasts several years. rotation crop depends on feed desirability
+CO,CO2,True,Part-Owner,,5,9,9,9,9,5,9,9,4,9,1,2,4,9,,,"we try to raise a crop that is not water depndent, like sudan grass, oats"
+CO,CO2,False,,,,,,,,,,,,,,,,,,,
+CO,CO2,True,Part-Owner,,8,8,8,6,5,5,5,10,,5,5,2,,8,,,
+CO,CO2,True,,,5,3,4,,2,1,8,,6,7,9,,10,,,,potatoes take a lot of inputs labor and specific equipment. Barley contracts are 1-3 years out. set rotation
+CO,CO3,False,Owner,,,,,,,,,,,,,,,,,,
+CO,CO3,True,Owner,,8,8,5,1,5,8,10,5,5,0,5,0,5,,,,using common sense and past experience
+CO,CO3,True,Owner,,1,5,5,7,10,8,1,1,5,5,1,1,1,1,,,"have only planted crops to feed the cattle, not to sell. Rotate alfalfa to grains back to alfalfa"
+CO,CO4,True,Owner,,10,,,,,,,,,,,,,,,,We only grow cannabis
+CO,CO4,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO4,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO4,False,Owner,,,,,,,,,,,,,,,,,,
+CO,CO5,True,Owner,,8,6,6,6,5,6,7,7,7,7,7,1,7,7,,,all crops grown are feed for cows -- never sell
+CO,CO5,True,Owner,,10,10,5,10,10,10,10,10,10,10,10,8,8,10,,,organic alfalfa contracts with dairies
+CO,CO5,True,Part-Owner,,,,,,,,,,,,,,,,,,we lease to a cattle rancher
+CO,CO5,False,,,,,,,,,,,,,,,,,,,
+CO,CO5,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO6,True,Owner,,10,8,7,9,6,,,,5,4,3,,2,1,,,Price of crop per amount of water used and the chances of it growing and being harvested successfully in our environment
+CO,CO6,True,Owner,,7,5,6,6,10,4,4,6,7,6,8,0,6,7,,,
+CO,CO7,True,Owner,,3,3,1,1,1,1,10,1,8,1,8,1,10,8,,,potatoes take special equipment but that has nothing to do with field choice
+CO,CO7,True,Owner,,8,8,1,1,1,1,10,8,10,10,8,1,7,8,,,i grow crops i know i have equipment for
+CO,CO7,True,Owner,,,,,,,,,,,,,,10,,,,
+CO,CO7,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO8,True,Other:,Agricultural Engineer/Owner,9,5,5,2,7,5,9,3,7,2,7,,9,5,,,
+CO,CO8,False,Part-Owner,,,,,,,,,,,,,,,,,,
+CO,CO8,True,Part-Owner,,10,9,5,7,10,10,6,4,6,5,8,1,8,8,,,potatoes are our main cash crop - we base decisions on crops that work around them plus water
+CO,CO8,True,Owner,,8,6,3,7,8,1,2,1,2,3,3,1,8,2,,,
+CO,CO9,True,Other:,part owner of HOA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,We are an HOA that uses irrigation well to water lawn,
+CO,CO9,True,Owner,,5,4,4,3,10,4,5,4,7,5,5,3,6,6,,,alfalfa and small grains
+CO,CO9,True,Owner,,,0,0,5,1,,,,,,,,8,8,,,
+CO,CO9,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO9,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO9,True,Owner,,5,8,4,1,1,10,6,5,10,1,10,1,1,10,,,at present horse hay/grass small bales
+CO,CO9,True,Owner,,8,8,8,1,6,1,8,1,9,8,8,2,6,8,,,
+CO,CO9,True,Owner,,,,,,,,,,,,,,,,,,
+CO,CO9,True,Owner,,3,4,6,6,0,9,5,9,6,6,7,8,5,7,,,
+CO,CO11,True,Owner,,1,5,5,1,10,10,5,5,5,1,1,1,5,5,,,"most crop hay used for winter feed for cattle, sale of alfalfa dependent on condition of hay"
+CO,CO11,True,Part-Owner,,1,1,1,10,9,10,5,10,5,1,3,1,0,10,,,since I only flood irrigate I usually plow up fields 1 erery 10 years. It is so labor intensive to replant alfalfa + meadow brome Hay and I am 74 years old
+CO,CO11,True,Owner,,10,9,9,2,5,2,10,9,10,8,8,2,10,5,,,
+CO,CO12,True,Owner,,7,7,7,3,8,8,10,7,10,7,9,0,7,7,,,water needs of crop
+CO,CO12,False,Owner,,,,,,,,,,,,,,,,,,
+CO,CO12,True,Owner,,,,,,,,,,,,,,,,,,I have a crop that I do not replant (_?_ hay)
+CO,CO12,True,Owner,,10,10,8,1,8,1,10,1,10,10,10,2,10,10,,,
+CO,CO13,False,,,,,,,,,,,,,,,,,,,
+CO,CO13,True,Owner,,8,6,6,4,10,10,9,6,10,6,8,1,6,5,,,I usually decide to plant oats on barley instead of alfalfa if the forecasted surface water will not hold out enough to irrigate the crop twice with river water
+CO,CO13,True,Owner,,10,10,5,,10,10,10,10,10,10,10,1,10,10,,,
+CO,CO14,True,Owner,,3,3,8,5,2,10,10,8,10,4,10,1,10,5,,,We raise mostly potatoes and barley due to practices and equipment
+CO,CO14,True,Owner,,10,1,1,,,,,,,,,,,,,,
+CO,CO14,True,Owner,,8,4,6,2,2,2,8,8,7,7,9,1,8,6,,,
+CO,CO14,True,Owner,,10,10,10,7,4,5,1,10,,,,,,,,,
+CO,CO15,True,Owner,,10,0,9,,8,,5,2,6,4,7,1,,3,,,Alfalfa hay prices have remained high/steady for several years
+CO,CO15,True,Operator,,9,10,8,1,5,2,1,8,10,2,6,0,8,2,,,trying to find crops that use less water
+CO,CO16,False,Owner,,,,,,,,,,,,,,,,,,
+CO,CO16,True,Owner,,10,9,5,,8,6,9,6,9,5,2,2,8,6,10,water use(?),"we plant low water use crops ie Aye, clover, sorghum"
+CO,CO16,True,Owner,,7,7,10,4,4,4,6,1,8,8,4,1,4,6,,,
+CO,CO16,True,Owner,,,,,,,,,,,,,,,,,,planting as a companion crop or as a crop with different seeding rattes
+CO,CO16,False,Owner,,,,10,,,,,,,,,,,,,,Time to fish
+KS,KS1,True,Other:,,,,0,0,0,0,6,3,0,0,0,0,7,0,0,,
+KS,KS4,True,Owner,,8,6,3,7,,2,8,,1,2,2,,9,3,,,
+KS,KS5,True,Owner,,10,10,10,10,10,10,10,10,10,10,10,10,10,10,1,need for feed,with cattle need feed each year / does excellent job each year
+KS,KS7,True,Owner,,,,,,,,,,,,,,,,,,
+KS,KS8,False,Owner,,,,,,,,,,,,,,,,,,
+KS,KS9,True,Owner,,10,3,5,5,2,7,10,1,10,5,1,1,1,8,,,"Corn has the best genetics u. wheat , milo"
+KS,KS9,True,Owner,,8,8,8,8,2,0,10,8,9,7,7,1,8,7,,,
+KS,KS11,True,Owner,,5,6,1,1,1,4,9,5,6,7,2,2,9,9,,,I plant corn and beans on irr land and wheat and corn on dry land crops
+KS,KS11,True,Part-Owner,,8,7,9,6,10,9,9,10,8,8,7,7,8,8,,,
+KS,KS12,True,Owner,,9,5,5,1,,,9,0,10,3,10,0,0,0,,,raise good tonnage and feed value
+KS,KS13,True,Operator,,8,8,2,8,6,6,8,6,8,6,3,1,5,5,,,
+KS,KS13,True,Owner,,10,10,0,7,0,6,8,5,10,8,8,2,0,7,,,
+KS,KS14,True,Owner,,6,4,3,8,7,5,8,2,3,4,4,1,7,4,,,
+KS,KS15,True,Owner,,10,10,5,5,,7,9,7,9,2,2,,5,5,,,"We raise and sell Certified Seed Wheat, other crops are worked into the rotation"
+KS,KS15,True,Part-Owner,,1,5,1,1,1,10,5,5,10,1,1,1,6,7,,,Rotation soybeans - wheat - corn
+KS,KS16,True,Owner,,8,8,7,10,10,4,10,2,10,10,8,1,7,10,,,
+KS,KS16,True,Part-Owner,,6,6,2,7,7,10,7,8,9,10,10,3,8,8,,,Price. Profit
+KS,KS16,True,Owner,,6,7,2,5,1,6,5,2,9,8,9,2,5,5,,,
+,,,,,,,,,,,,,,,,,,,,,
+,,,,,7.075471698,6.245283019,5.054545455,4.673469388,5.54,5.510204082,7.235294118,5.306122449,7.448979592,5.333333333,5.94,1.777777778,6.24,6.16,2.75,,

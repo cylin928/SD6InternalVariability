@@ -29,7 +29,7 @@ medians = {
 hue_var_dict = {
     "Pr": "Prec ratio\n(Pr)",
     "Cr": "Crop price\nratio (Cr)",
-    "Co": "Corn field\nratio (Co)",
+    "Co": "Initial corn\nfield ratio (Co)",
     }
 
 y_var_dict = {

@@ -177,7 +177,7 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     map_dict = {
         "Pr": "Prec ratio\n(Pr)",
         "Cr": "Crop price\nratio (Cr)",
-        "Co": "Corn field\nratio (Co)",
+        "Co": "Initial corn\nfield ratio (Co)",
         "IV": "Internal\nvariability",
         "Error": "Model\nerror",
         "Interaction terms": "Interaction\nterms"}
@@ -292,7 +292,7 @@ def plot_anova_sum_sq_fraction_old(mu_dict, save_figname=None):
     map_dict = {
         "Pr": "Prec ratio\n(Pr)",
         "Cr": "Crop price\nratio (Cr)",
-        "Co": "Corn field\nratio (Co)",
+        "Co": "Initial corn\nfield ratio (Co)",
         "Residual": "Internal\nvariability",
         "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
@@ -415,7 +415,7 @@ def plot_anova_sum_sq(mu_dict, save_figname=None):
     map_dict = {
         "Pr": "Prec ratio\n(Pr)",
         "Cr": "Crop price\nratio (Cr)",
-        "Co": "Corn field\nratio (Co)",
+        "Co": "Initial corn\nfield ratio (Co)",
         "Residual": "Internal\nvariability",
         "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
@@ -588,7 +588,7 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
 
     # Add legend
     handles, labels = ax.get_legend_handles_labels()
-    map_dict = {"Pr": "Prec ratio\n(Pr)", "Cr": "Crop price\nratio (Cr)", "Co": "Corn field\nratio (Co)", "Residual": "Internal\nvariability", "Interaction terms": "Interaction\nterms"}
+    map_dict = {"Pr": "Prec ratio\n(Pr)", "Cr": "Crop price\nratio (Cr)", "Co": "Initial corn\nfield ratio (Co)", "Residual": "Internal\nvariability", "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
     legend1 = fig.legend(handles, labels, ncols=5, bbox_to_anchor=(0.5, 0.03), loc='upper center', frameon=False, fontsize=8)
     # Second legend: hatch styles
