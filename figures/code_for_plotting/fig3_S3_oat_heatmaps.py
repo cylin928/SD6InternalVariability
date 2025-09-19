@@ -10,6 +10,10 @@ pn = pathnavigator.create(root_dir)
 df_rank = pd.read_csv(pn.figures.data_for_plotting.get()/"fig3_oat_df_rank.csv", index_col=[0])
 df_si = pd.read_csv(pn.figures.data_for_plotting.get()/"fig3_oat_df_si.csv", index_col=[0])
 
+df_rank.index = [i.replace("\r", "") for i in df_rank.index]
+df_si.index = [i.replace("\r", "") for i in df_si.index]
+df_rank.columns = [i.replace("\r", "") for i in df_rank.columns]
+df_si.columns = [i.replace("\r", "") for i in df_si.columns]
 #%% Figure 3 OAT heatmap
 factors_ = [
     "Precipitation",

@@ -596,7 +596,7 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     hatch_higher = mpatches.Patch(facecolor='white', edgecolor='dimgray', hatch=None, label='Higher than\nhistorical values')
     legend2 = fig.legend(
         [hatch_higher, hatch_lower],
-        ['Higher irrigation norm', 'Lower irrigation norm'],
+        ['Higher irrigation intensity', 'Lower irrigation intensity'],
         ncol=2,
         bbox_to_anchor=(0.5, -0.1),
         loc='upper center',
