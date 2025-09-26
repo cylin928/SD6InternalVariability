@@ -1,10 +1,6 @@
-# The Role of Internal Variability in Shaping Groundwater Policy Effectiveness
+# The Role of Internal Variability in Shaping Groundwater Policy Design
 
-This repository contains the complete codebase for the research paper "The Role of Internal Variability in Shaping Groundwater Policy Effectiveness", which investigates how internal variability influence the transferability and effectiveness of groundwater conservation policies.
-
-## Overview
-
-TBA
+This repository contains the complete codebase for the research paper "The Role of Internal Variability in Shaping Groundwater Policy Design."
 
 ## Prerequisites
 
