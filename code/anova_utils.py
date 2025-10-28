@@ -9,6 +9,10 @@ import matplotlib.patches as mpatches
 import seaborn as sns
 import clt
 
+from scipy.stats import levene
+from scipy.stats import normaltest
+import statsmodels.api as sm
+
 var_dict = {
     'ST': 'Saturated\nthickness',
     'Wi': 'Withdrawal',
@@ -19,7 +23,152 @@ var_dict = {
     'TP': 'Total\nprofit'
     }
 
-def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=False):
+
+def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=True):
+    """
+    Conduct ANOVA for a specific year and optionally plot residuals.
+
+    Parameters
+    ==========
+    y_out : str
+        The dependent variable for the ANOVA.
+    df_sys_all : DataFrame
+        The DataFrame containing the data for the ANOVA.
+    yr : int
+        The year for which to conduct the ANOVA.
+    seed : int, optional
+        The seed for the simulation. If None, all seeds are included.
+    """
+    df = df_sys_all[df_sys_all["Year"] == yr]
+
+    if seed is not None:
+        df = df[df["Seed"] == seed]
+    
+    # df.isna().any().any()
+    
+    # mask = ~np.isfinite(df.select_dtypes(include=[np.number]))
+    # df_with_inf = df[mask.any(axis=1)]
+    # print(df_with_inf)
+    
+    # for c in ["Pr", "Cr", "Co"]:
+    #     print(c, df[c].unique(), "count:", df[c].nunique())
+        
+    # from patsy import dmatrix
+    # X = dmatrix("C(Pr)*C(Cr)*C(Co)", df, return_type="dataframe")
+    # print("Rank:", np.linalg.matrix_rank(X))
+    # print("Columns:", X.shape[1])
+    
+    # combo_counts = df.groupby(["Pr", "Cr", "Co"]).size().reset_index(name="count")
+    # print(combo_counts.head())
+    # print("Unique combinations:", len(combo_counts))
+    # print("Total rows:", len(df))
+        
+    # has_replication = any(combo_counts["count"] > 1)
+    # print("Any replicated combination?", has_replication)
+
+    formula = f"{y_out} ~ C(Pr) * C(Cr) * C(Co)"
+    model = ols(formula, data=df).fit()
+    # print(model.summary())
+
+    anova_results = anova_lm(model, typ=2)
+    print("ANOVA Results:\n", anova_results)
+
+    # Get residuals for each group
+    residuals = model.resid
+    groups = []
+    for pr in df['Pr'].unique():
+        for cr in df['Cr'].unique():
+            for co in df['Co'].unique():
+                group_mask = (df['Pr'] == pr) & (df['Cr'] == cr) & (df['Co'] == co)
+                groups.append(residuals[group_mask])
+
+    # Perform Levene test
+    levene_stat, levene_p = levene(*groups)
+
+    # Calculate standardized residuals
+    # standardized_residual = residual / sqrt( var(residuals_in_group) / group size )
+    resid = model.resid  
+
+    # compute group variance and group counts using grouping by factor columns
+    group_var = resid.groupby([df["Pr"], df["Cr"], df["Co"]]).transform("var")
+    group_n = resid.groupby([df["Pr"], df["Cr"], df["Co"]]).transform("count")
+
+    # standard error per observation based on group variance / n
+    se = np.sqrt(group_var / group_n)
+    # avoid division by zero -> produce NaN where se == 0
+    se = se.replace(0, np.nan)
+    standardized_residuals = resid / se
+
+    # Perform normality tests on standardized residuals (drop NaNs)
+    _, Omnibus_p = normaltest(standardized_residuals.dropna())
+
+    if plot_residual:
+        # 2 rows x 3 cols:
+        # row 0 = raw residuals: histogram | QQ | resid vs fitted
+        # row 1 = standardized residuals: histogram | QQ | std resid vs fitted
+        residuals = model.resid.dropna()
+        fitted = model.fittedvalues.loc[residuals.index]
+        std_resid = standardized_residuals.dropna()
+
+        fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+
+        # Row 0: raw residuals
+        sns.histplot(residuals, kde=True, bins=50, color='skyblue', ax=axes[0, 0])
+        axes[0, 0].set_title(f"Histogram of Raw Residuals (Year {yr})")
+        axes[0, 0].set_xlabel("Residual")
+        axes[0, 0].set_ylabel("Frequency")
+        axes[0, 0].grid(True)
+
+        sm.qqplot(residuals, line="45", ax=axes[0, 1])
+        axes[0, 1].set_title("Q-Q plot of Raw Residuals")
+
+        axes[0, 2].scatter(fitted, residuals, alpha=0.6, s=20, color='C0')
+        axes[0, 2].axhline(0, color='r', linestyle='--')
+        axes[0, 2].set_xlabel("Fitted values")
+        axes[0, 2].set_ylabel("Raw residuals")
+        axes[0, 2].set_title("Raw Residuals vs Fitted")
+        axes[0, 2].grid(True)
+
+        # Row 1: standardized residuals
+        sns.histplot(std_resid, kde=True, bins=50, color='lightgreen', ax=axes[1, 0])
+        axes[1, 0].set_title(f"Histogram of Standardized Residuals (Year {yr})")
+        axes[1, 0].set_xlabel("Standardized residual")
+        axes[1, 0].set_ylabel("Frequency")
+        axes[1, 0].grid(True)
+
+        sm.qqplot(std_resid, line="45", ax=axes[1, 1])
+        axes[1, 1].set_title("Q-Q plot of Standardized Residuals")
+
+        # align fitted values to standardized resid indices
+        fitted_std = model.fittedvalues.loc[std_resid.index]
+        axes[1, 2].scatter(fitted_std, std_resid, alpha=0.6, s=20, color='C2')
+        axes[1, 2].axhline(0, color='r', linestyle='--')
+        axes[1, 2].set_xlabel("Fitted values")
+        axes[1, 2].set_ylabel("Standardized residuals")
+        axes[1, 2].set_title("Standardized Residuals vs Fitted")
+        axes[1, 2].grid(True)
+
+        # add header with y_out, seed, year, Prob(Omnibus), and Levene p-value
+        seed_str = str(seed) if seed is not None else "all"
+        header = f"{y_out} | seed={seed_str} | year={yr}"
+        fig.suptitle(header, fontsize=12)
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.90)  # leave space for suptitle
+
+        # save figure named as y_out + seed + yr
+        out_name = f"{y_out}_{seed_str}_{yr}.png"
+        fig.savefig( r'/Users/cl/Documents/GitHub/SD6InternalVariability/figures/anova_test'+'/'+out_name, dpi=200, bbox_inches='tight')
+        print(f"Saved residual plot to {out_name}")
+
+        #fig.show()
+
+    return anova_results["sum_sq"]/anova_results["df"], levene_p, Omnibus_p
+
+
+
+
+
+def anova_yr_old(y_out, df_sys_all, yr, seed=None, plot_residual=False):
     """
     Conduct ANOVA for a specific year and optionally plot residuals.
 
@@ -75,6 +224,39 @@ def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True):
         Whether to normalize the sum of squares.
     """
     sum_sq = pd.DataFrame()
+    levene_test = pd.DataFrame(index=['p_value']) 
+    Omnibus_test = pd.DataFrame(index=['p_value']) 
+    for yr in range(2013, 2023):
+        try:
+            sum_sq[yr], levene_test[yr], Omnibus_test[yr] = anova_yr(y_out, df_sys_all, yr, seed)
+        except:
+            sum_sq[yr], levene_test[yr], Omnibus_test[yr] = anova_yr(y_out, df_sys_all, yr, seed)
+            pass
+
+    sum_sq = sum_sq.T
+    if to_fraction: # Sum of all sum of squares = 1
+        sum_sq = sum_sq.div(sum_sq.sum(axis=1), axis=0)
+    sum_sq["Seed"] = seed
+    levene_test["Seed"] = seed
+    Omnibus_test["Seed"] = seed
+    return sum_sq, levene_test, Omnibus_test
+
+def get_sum_sq_over_years_old(y_out, df_sys_all, seed=None, to_fraction=True):
+    """
+    Get normalized sum of squares over years for a specific seed.
+
+    Parameters
+    ==========
+    y_out : str
+        The dependent variable for the ANOVA.
+    df_sys_all : DataFrame
+        The DataFrame containing the data for the ANOVA.
+    seed : int, optional
+        The seed for the simulation. If None, all seeds are included.
+    to_fraction : bool, optional
+        Whether to normalize the sum of squares.
+    """
+    sum_sq = pd.DataFrame()
     for yr in range(2013, 2023):
         sum_sq[yr] = anova_yr(y_out, df_sys_all, yr, seed)["sum_sq"]
     sum_sq = sum_sq.T
@@ -84,6 +266,43 @@ def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True):
     return sum_sq
 
 def get_mu_sd_dfs_over_seeds(y_out, df_sys_all, aggre_interaction_term=True, to_fraction=True):
+    """
+    Get mean and standard deviation of normalized sum of squares over seeds.
+
+    Parameters
+    ==========
+    y_out : str
+        The dependent variable for the ANOVA.
+    df_sys_all : DataFrame
+        The DataFrame containing the data for the ANOVA.
+    aggre_interaction_term : bool, optional
+        Whether to aggregate interaction terms into a single column.
+    """
+    sum_sq_nor = []
+    levene_all = []
+    Omnibus_all = []
+    for seed in [67]:#[1, 2]:#, 67]: #[67]:#
+        df, levene, Omnibus = get_sum_sq_over_years(y_out, df_sys_all, seed=seed, to_fraction=to_fraction)
+        if aggre_interaction_term:
+            cols = [i for i in df.columns if ":" in i]
+            df["Interaction terms"] = df[cols].sum(axis=1)
+            df = df.drop(cols, axis=1)
+        sum_sq_nor.append(df)
+
+    # Mean over seeds
+    sum_sq_nor_mu = pd.concat(sum_sq_nor).groupby(level=0).mean()
+
+    # Calculate cumulative sum for each row for stacked bar plot
+    sum_sq_nor_cumsum = []
+    for df in sum_sq_nor:
+        df.loc[:, df.columns[:-1]] = df.loc[:, df.columns[:-1]].cumsum(axis=1)
+        sum_sq_nor_cumsum.append(df)
+
+    # Standard deviation over seeds
+    sum_sq_nor_std = pd.concat(sum_sq_nor_cumsum).groupby(level=0).std()
+    return sum_sq_nor_mu.drop("Seed", axis=1), sum_sq_nor_std.drop("Seed", axis=1), levene_all, Omnibus_all
+
+def get_mu_sd_dfs_over_seeds_old(y_out, df_sys_all, aggre_interaction_term=True, to_fraction=True):
     """
     Get mean and standard deviation of normalized sum of squares over seeds.
 

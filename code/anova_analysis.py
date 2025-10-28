@@ -3,6 +3,7 @@ import numpy as np
 import pathnavigator
 import clt
 root_dir = rf"C:\Users\{pathnavigator.user}\Documents\GitHub\SD6InternalVariability"
+root_dir = rf"/Users/{pathnavigator.user}/Documents/GitHub/SD6InternalVariability"
 pn = pathnavigator.create(root_dir)
 pn.code.chdir()
 from anova_utils import (
@@ -12,14 +13,40 @@ from anova_utils import (
 # Collected simulated results
 df_sys_all = pd.read_parquet(pn.outputs.ANOVA.get("df_sys_all.parquet"))
 vlist = ['ST', 'CF', 'Wi', 'CSC']
+
+#df_sys_all_ = df_sys_all[df_sys_all["Seed"] == 67]
+#df_sys_all_ = df_sys_all_[df_sys_all_["Year"] == 2013]
+
+#%%
+from statsmodels.formula.api import ols
+from statsmodels.stats.anova import anova_lm
+
+v='ST'
+to_fraction=False
+y_out=v
+seed=67
+yr=2013
+
+df = df_sys_all[df_sys_all["Year"]==yr][df_sys_all["Seed"]==seed]
+formula = f"{y_out} ~ C(Pr) * C(Cr) * C(Co) - C(Pr):C(Cr):C(Co)"
+model = ols(formula, data=df).fit()
+
 #%% Compute ANONA over seeds
 mu_dict_all = {}
 sd_dict_all = {}
-for v in vlist:
-    mu_dict_all[v], sd_dict_all[v] = get_mu_sd_dfs_over_seeds(v, df_sys_all, to_fraction=False)
-clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_mu_sum_sq.h5")
-clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_sd_sum_sq.h5")
 
+levene_all = {} 
+Omnibus_all = {}
+for v in vlist:
+    mu_dict_all[v], sd_dict_all[v], levene_all[v], Omnibus_all[v] = get_mu_sd_dfs_over_seeds(v, df_sys_all, to_fraction=False)
+    
+#%%
+# clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_mu_sum_sq_boyu.h5")
+# clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_sd_sum_sq_boyu.h5")
+# clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_levene_all_boyu.h5")
+# clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_Omnibus_all_boyu.h5")
+
+# clt.io.read_pd_hdf5()
 #%% Conduct ANOVA decomposition with fixed IV for estimating ANOVA model structural error (No need to rerun)
 cd_vals = df_sys_all["Cd"].unique()
 re_vals = df_sys_all["Re"].unique()
@@ -63,7 +90,7 @@ clt.io.to_pd_hdf5(data=sd_avg_all, file_path=pn.outputs.ANOVA.get()/"anova_sd_su
 
 #%% Calculate IV
 r"""
-Estimated Internal Variability≈Var(residual,all) − Var(residual,fixed)
+Estimated Internal Variability≈Var(residual,all) − Var(residual,fixed)
 ​
 This assumes:
 
@@ -71,7 +98,7 @@ This assumes:
 - The simulation noise or numerical error is stable across runs (not biased by fixed seed).
 
 You can then reinterpret your original residual term in the main ANOVA as:
-Residual = Model Error + Internal Variability
+Residual = Model Error + Internal Variability
 """
 mu_dict_fixedIV = clt.io.read_pd_hdf5(pn.outputs.ANOVA.get()/"anova_mu_sum_sq_avg_fixedIV.h5")
 sd_dict_fixedIV = clt.io.read_pd_hdf5(pn.outputs.ANOVA.get()/"anova_sd_sum_sq_avg_fixedIV.h5")
