@@ -8,8 +8,20 @@ pn.code.chdir()
 
 from anova_utils import plot_anova_sum_sq_fraction, plot_norm_comparison
 
+
+import re
+
+def strip_C(col):
+    return re.sub(r"C\((.*?)\)", r"\1", col)
+
+
+    
+    
 # The plotting data is copied from outputs
 mu_dict = clt.io.read_pd_hdf5(pn.figures.data_for_plotting.get()/"anova_mu_fraction_withIV_seperated.h5")
+for k, df in mu_dict.items():
+    df.rename(columns=strip_C, inplace=True)
+#mu_dict = clt.io.read_pd_hdf5(pn.figures.data_for_plotting.get()/"anova_mu_fraction_withIV_seperated.h5")
 plot_anova_sum_sq_fraction(mu_dict, pn.figures.get() / "fig4_anova.jpg")
 
 

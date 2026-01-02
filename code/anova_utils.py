@@ -24,7 +24,7 @@ var_dict = {
     }
 
 
-def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=True):
+def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=False, typ=2):
     """
     Conduct ANOVA for a specific year and optionally plot residuals.
 
@@ -70,7 +70,7 @@ def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=True):
     model = ols(formula, data=df).fit()
     # print(model.summary())
 
-    anova_results = anova_lm(model, typ=2)
+    anova_results = anova_lm(model, typ=typ)
     print("ANOVA Results:\n", anova_results)
 
     # Get residuals for each group
@@ -164,51 +164,7 @@ def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=True):
 
     return anova_results["sum_sq"]/anova_results["df"], levene_p, Omnibus_p
 
-
-
-
-
-def anova_yr_old(y_out, df_sys_all, yr, seed=None, plot_residual=False):
-    """
-    Conduct ANOVA for a specific year and optionally plot residuals.
-
-    Parameters
-    ==========
-    y_out : str
-        The dependent variable for the ANOVA.
-    df_sys_all : DataFrame
-        The DataFrame containing the data for the ANOVA.
-    yr : int
-        The year for which to conduct the ANOVA.
-    seed : int, optional
-        The seed for the simulation. If None, all seeds are included.
-    """
-    df = df_sys_all[df_sys_all["Year"] == yr]
-
-    if seed is not None:
-        df = df[df["Seed"] == seed]
-    formula = f"{y_out} ~ Pr + Cr + Co + Pr:Cr + Pr:Co + Cr:Co + Pr:Cr:Co"
-    model = ols(formula, data=df).fit()
-    print(model.summary())
-
-    anova_results = anova_lm(model, typ=2)
-    print("ANOVA Results:\n", anova_results)
-
-    if plot_residual:
-        # This is a histogram of the residuals of the model to check the normality assumption.
-        residuals = model.resid
-        fig, ax = plt.subplots(figsize=(4, 5))
-        sns.histplot(residuals, kde=True, bins=50, color='skyblue', ax=ax)
-        ax.set_title(f"Histogram of Model Residuals in Year {yr}")
-        ax.set_xlabel("Residual")
-        ax.set_ylabel("Frequency")
-        ax.grid(True)
-        plt.tight_layout()
-        plt.show()
-
-    return anova_results
-
-def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True):
+def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True, typ=2):
     """
     Get normalized sum of squares over years for a specific seed.
 
@@ -228,9 +184,9 @@ def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True):
     Omnibus_test = pd.DataFrame(index=['p_value']) 
     for yr in range(2013, 2023):
         try:
-            sum_sq[yr], levene_test[yr], Omnibus_test[yr] = anova_yr(y_out, df_sys_all, yr, seed)
+            sum_sq[yr], levene_test[yr], Omnibus_test[yr] = anova_yr(y_out, df_sys_all, yr, seed, typ=typ)
         except:
-            sum_sq[yr], levene_test[yr], Omnibus_test[yr] = anova_yr(y_out, df_sys_all, yr, seed)
+            sum_sq[yr], levene_test[yr], Omnibus_test[yr] = anova_yr(y_out, df_sys_all, yr, seed, typ=typ)
             pass
 
     sum_sq = sum_sq.T
@@ -241,31 +197,7 @@ def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True):
     Omnibus_test["Seed"] = seed
     return sum_sq, levene_test, Omnibus_test
 
-def get_sum_sq_over_years_old(y_out, df_sys_all, seed=None, to_fraction=True):
-    """
-    Get normalized sum of squares over years for a specific seed.
-
-    Parameters
-    ==========
-    y_out : str
-        The dependent variable for the ANOVA.
-    df_sys_all : DataFrame
-        The DataFrame containing the data for the ANOVA.
-    seed : int, optional
-        The seed for the simulation. If None, all seeds are included.
-    to_fraction : bool, optional
-        Whether to normalize the sum of squares.
-    """
-    sum_sq = pd.DataFrame()
-    for yr in range(2013, 2023):
-        sum_sq[yr] = anova_yr(y_out, df_sys_all, yr, seed)["sum_sq"]
-    sum_sq = sum_sq.T
-    if to_fraction: # Sum of all sum of squares = 1
-        sum_sq = sum_sq.div(sum_sq.sum(axis=1), axis=0)
-    sum_sq["Seed"] = seed
-    return sum_sq
-
-def get_mu_sd_dfs_over_seeds(y_out, df_sys_all, aggre_interaction_term=True, to_fraction=True):
+def get_mu_sd_dfs_over_seeds(y_out, df_sys_all, aggre_interaction_term=True, to_fraction=True, typ=2):
     """
     Get mean and standard deviation of normalized sum of squares over seeds.
 
@@ -281,12 +213,12 @@ def get_mu_sd_dfs_over_seeds(y_out, df_sys_all, aggre_interaction_term=True, to_
     sum_sq_nor = []
     levene_all = []
     Omnibus_all = []
-    for seed in [67]:#[1, 2]:#, 67]: #[67]:#
-        df, levene, Omnibus = get_sum_sq_over_years(y_out, df_sys_all, seed=seed, to_fraction=to_fraction)
+    for seed in [67, 1, 2]:#, 67]: #[67]:#
+        df, levene, Omnibus = get_sum_sq_over_years(y_out, df_sys_all, seed=seed, to_fraction=to_fraction, typ=typ)
         if aggre_interaction_term:
             cols = [i for i in df.columns if ":" in i]
             df["Interaction terms"] = df[cols].sum(axis=1)
-            df = df.drop(cols, axis=1)
+            #df = df.drop(cols, axis=1)
         sum_sq_nor.append(df)
 
     # Mean over seeds
@@ -300,42 +232,8 @@ def get_mu_sd_dfs_over_seeds(y_out, df_sys_all, aggre_interaction_term=True, to_
 
     # Standard deviation over seeds
     sum_sq_nor_std = pd.concat(sum_sq_nor_cumsum).groupby(level=0).std()
-    return sum_sq_nor_mu.drop("Seed", axis=1), sum_sq_nor_std.drop("Seed", axis=1), levene_all, Omnibus_all
+    return sum_sq_nor_mu.drop("Seed", axis=1), sum_sq_nor_std.drop("Seed", axis=1), levene_all, Omnibus_all, sum_sq_nor
 
-def get_mu_sd_dfs_over_seeds_old(y_out, df_sys_all, aggre_interaction_term=True, to_fraction=True):
-    """
-    Get mean and standard deviation of normalized sum of squares over seeds.
-
-    Parameters
-    ==========
-    y_out : str
-        The dependent variable for the ANOVA.
-    df_sys_all : DataFrame
-        The DataFrame containing the data for the ANOVA.
-    aggre_interaction_term : bool, optional
-        Whether to aggregate interaction terms into a single column.
-    """
-    sum_sq_nor = []
-    for seed in [1, 2, 67]: #[67]:#
-        df = get_sum_sq_over_years(y_out, df_sys_all, seed=seed, to_fraction=to_fraction)
-        if aggre_interaction_term:
-            cols = [i for i in df.columns if ":" in i]
-            df["Interaction terms"] = df[cols].sum(axis=1)
-            df = df.drop(cols, axis=1)
-        sum_sq_nor.append(df)
-
-    # Mean over seeds
-    sum_sq_nor_mu = pd.concat(sum_sq_nor).groupby(level=0).mean()
-
-    # Calculate cumulative sum for each row for stacked bar plot
-    sum_sq_nor_cumsum = []
-    for df in sum_sq_nor:
-        df.loc[:, df.columns[:-1]] = df.loc[:, df.columns[:-1]].cumsum(axis=1)
-        sum_sq_nor_cumsum.append(df)
-
-    # Standard deviation over seeds
-    sum_sq_nor_std = pd.concat(sum_sq_nor_cumsum).groupby(level=0).std()
-    return sum_sq_nor_mu.drop("Seed", axis=1), sum_sq_nor_std.drop("Seed", axis=1)
 
 def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     vlist = ['ST', 'CF', 'Wi', 'CSC']
@@ -855,3 +753,102 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
         fig.savefig(save_figname, dpi=300, bbox_inches='tight')
     plt.show()
 
+def anova_yr_old(y_out, df_sys_all, yr, seed=None, plot_residual=False):
+    """
+    Conduct ANOVA for a specific year and optionally plot residuals.
+
+    Parameters
+    ==========
+    y_out : str
+        The dependent variable for the ANOVA.
+    df_sys_all : DataFrame
+        The DataFrame containing the data for the ANOVA.
+    yr : int
+        The year for which to conduct the ANOVA.
+    seed : int, optional
+        The seed for the simulation. If None, all seeds are included.
+    """
+    df = df_sys_all[df_sys_all["Year"] == yr]
+
+    if seed is not None:
+        df = df[df["Seed"] == seed]
+    # formula = f"{y_out} ~ C(Pr) * C(Cr) * C(Co)"
+    formula = f"{y_out} ~ Pr + Cr + Co + Pr:Cr + Pr:Co + Cr:Co + Pr:Cr:Co"
+    model = ols(formula, data=df).fit()
+    print(model.summary())
+
+    anova_results = anova_lm(model, typ=2)
+    print("ANOVA Results:\n", anova_results)
+
+    if plot_residual:
+        # This is a histogram of the residuals of the model to check the normality assumption.
+        residuals = model.resid
+        fig, ax = plt.subplots(figsize=(4, 5))
+        sns.histplot(residuals, kde=True, bins=50, color='skyblue', ax=ax)
+        ax.set_title(f"Histogram of Model Residuals in Year {yr}")
+        ax.set_xlabel("Residual")
+        ax.set_ylabel("Frequency")
+        ax.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    return anova_results
+
+def get_sum_sq_over_years_old(y_out, df_sys_all, seed=None, to_fraction=True):
+    """
+    Get normalized sum of squares over years for a specific seed.
+
+    Parameters
+    ==========
+    y_out : str
+        The dependent variable for the ANOVA.
+    df_sys_all : DataFrame
+        The DataFrame containing the data for the ANOVA.
+    seed : int, optional
+        The seed for the simulation. If None, all seeds are included.
+    to_fraction : bool, optional
+        Whether to normalize the sum of squares.
+    """
+    sum_sq = pd.DataFrame()
+    for yr in range(2013, 2023):
+        sum_sq[yr] = anova_yr(y_out, df_sys_all, yr, seed)["sum_sq"]
+    sum_sq = sum_sq.T
+    if to_fraction: # Sum of all sum of squares = 1
+        sum_sq = sum_sq.div(sum_sq.sum(axis=1), axis=0)
+    sum_sq["Seed"] = seed
+    return sum_sq
+
+def get_mu_sd_dfs_over_seeds_old(y_out, df_sys_all, aggre_interaction_term=True, to_fraction=True):
+    """
+    Get mean and standard deviation of normalized sum of squares over seeds.
+
+    Parameters
+    ==========
+    y_out : str
+        The dependent variable for the ANOVA.
+    df_sys_all : DataFrame
+        The DataFrame containing the data for the ANOVA.
+    aggre_interaction_term : bool, optional
+        Whether to aggregate interaction terms into a single column.
+    """
+    sum_sq_nor = []
+    for seed in [1, 2, 67]: #[67]:#
+        df = get_sum_sq_over_years(y_out, df_sys_all, seed=seed, to_fraction=to_fraction)
+        if aggre_interaction_term:
+            cols = [i for i in df.columns if ":" in i]
+            df["Interaction terms"] = df[cols].sum(axis=1)
+            df = df.drop(cols, axis=1)
+        sum_sq_nor.append(df)
+
+    # Mean over seeds
+    sum_sq_nor_mu = pd.concat(sum_sq_nor).groupby(level=0).mean()
+
+    # Calculate cumulative sum for each row for stacked bar plot
+    sum_sq_nor_cumsum = []
+    for df in sum_sq_nor:
+        df.loc[:, df.columns[:-1]] = df.loc[:, df.columns[:-1]].cumsum(axis=1)
+        sum_sq_nor_cumsum.append(df)
+
+    # Standard deviation over seeds
+    sum_sq_nor_std = pd.concat(sum_sq_nor_cumsum).groupby(level=0).std()
+    return sum_sq_nor_mu.drop("Seed", axis=1), sum_sq_nor_std.drop("Seed", axis=1)

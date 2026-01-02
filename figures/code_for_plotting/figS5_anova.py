@@ -11,6 +11,7 @@ pn = pathnavigator.create(root_dir)
 pn.code.chdir()
 
 df_sys_all = pd.read_parquet(pn.outputs.ANOVA.get("df_sys_all.parquet"))
+
 #%% Plot ANONA time series
 # Define y-variables and hue-variables
 y_vars = ['ST', 'Wi', 'CF', 'CSC']

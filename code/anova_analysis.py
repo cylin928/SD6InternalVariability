@@ -18,18 +18,18 @@ vlist = ['ST', 'CF', 'Wi', 'CSC']
 #df_sys_all_ = df_sys_all_[df_sys_all_["Year"] == 2013]
 
 #%%
-from statsmodels.formula.api import ols
-from statsmodels.stats.anova import anova_lm
+# from statsmodels.formula.api import ols
+# from statsmodels.stats.anova import anova_lm
 
-v='ST'
-to_fraction=False
-y_out=v
-seed=67
-yr=2013
+# v='ST'
+# to_fraction=False
+# y_out=v
+# seed=67
+# yr=2013
 
-df = df_sys_all[df_sys_all["Year"]==yr][df_sys_all["Seed"]==seed]
-formula = f"{y_out} ~ C(Pr) * C(Cr) * C(Co) - C(Pr):C(Cr):C(Co)"
-model = ols(formula, data=df).fit()
+# df = df_sys_all[df_sys_all["Year"]==yr][df_sys_all["Seed"]==seed]
+# formula = f"{y_out} ~ C(Pr) * C(Cr) * C(Co) - C(Pr):C(Cr):C(Co)"
+# model = ols(formula, data=df).fit()
 
 #%% Compute ANONA over seeds
 mu_dict_all = {}
@@ -37,14 +37,15 @@ sd_dict_all = {}
 
 levene_all = {} 
 Omnibus_all = {}
-for v in vlist:
+l = len(vlist)
+for i, v in enumerate(vlist):
     mu_dict_all[v], sd_dict_all[v], levene_all[v], Omnibus_all[v] = get_mu_sd_dfs_over_seeds(v, df_sys_all, to_fraction=False)
-    
-#%%
-# clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_mu_sum_sq_boyu.h5")
-# clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_sd_sum_sq_boyu.h5")
-# clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_levene_all_boyu.h5")
-# clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_Omnibus_all_boyu.h5")
+    print(i+1,"/", l)
+
+clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_mu_sum_sq.h5")
+clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_sd_sum_sq.h5")
+clt.io.to_pd_hdf5(data=mu_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_levene_all.h5")
+clt.io.to_pd_hdf5(data=sd_dict_all, file_path=pn.outputs.ANOVA.get()/"anova_Omnibus_all.h5")
 
 # clt.io.read_pd_hdf5()
 #%% Conduct ANOVA decomposition with fixed IV for estimating ANOVA model structural error (No need to rerun)
