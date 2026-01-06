@@ -24,7 +24,7 @@ var_dict = {
     }
 
 
-def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=False, typ=2):
+def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=False, typ=1):
     """
     Conduct ANOVA for a specific year and optionally plot residuals.
 
@@ -162,7 +162,7 @@ def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=False, typ=2):
 
         #fig.show()
 
-    return anova_results["sum_sq"]/anova_results["df"], levene_p, Omnibus_p
+    return anova_results["sum_sq"], levene_p, Omnibus_p
 
 def get_sum_sq_over_years(y_out, df_sys_all, seed=None, to_fraction=True, typ=2):
     """
@@ -589,14 +589,26 @@ def plot_anova_sum_sq(mu_dict, save_figname=None):
         fig.savefig(save_figname, dpi=300, bbox_inches='tight')
     plt.show()
 
+import re
+
 def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None):
+    def strip_C(col):
+        return re.sub(r"C\((.*?)\)", r"\1", col)
     def get_df_higher_lower(v_regime):
         if fraction:
             mu_dict_h = clt.io.read_pd_hdf5(file_path=pn.outputs.ANOVA.get()/f"anova_mu_fraction_{v_regime}_higher.h5")
             mu_dict_l = clt.io.read_pd_hdf5(file_path=pn.outputs.ANOVA.get()/f"anova_mu_fraction_{v_regime}_lower.h5")
+            for k, df in mu_dict_h.items():
+                df.rename(columns=strip_C, inplace=True)
+            for k, df in mu_dict_l.items():
+                df.rename(columns=strip_C, inplace=True)
         else:
             mu_dict_h = clt.io.read_pd_hdf5(file_path=pn.outputs.ANOVA.get()/f"anova_mu_sum_sq_{v_regime}_higher.h5")
             mu_dict_l = clt.io.read_pd_hdf5(file_path=pn.outputs.ANOVA.get()/f"anova_mu_sum_sq_{v_regime}_lower.h5")
+            for k, df in mu_dict_h.items():
+                df.rename(columns=strip_C, inplace=True)
+            for k, df in mu_dict_l.items():
+                df.rename(columns=strip_C, inplace=True)
         df_higher = []
         df_lower = []
         vlist = ['ST', 'CF', 'Wi', 'CSC']
@@ -610,7 +622,7 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     def add_bars(ax, df_lower, df_higher, hatch_at="lower"):
         width = 0.35  # bar width
         gap = 0.08
-        categories = df_higher.columns
+        categories = ['Pr', 'Cr', 'Co', 'Residual', 'Interaction terms'] #df_higher.columns
         groups = df_higher.index  # e.g., ST, CF, Wi, CSC
         x = np.arange(len(groups))  # x positions for groups
 

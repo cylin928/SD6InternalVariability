@@ -17,12 +17,12 @@ def strip_C(col):
 
     
     
-# The plotting data is copied from outputs
-mu_dict = clt.io.read_pd_hdf5(pn.figures.data_for_plotting.get()/"anova_mu_fraction_withIV_seperated.h5")
-for k, df in mu_dict.items():
-    df.rename(columns=strip_C, inplace=True)
-#mu_dict = clt.io.read_pd_hdf5(pn.figures.data_for_plotting.get()/"anova_mu_fraction_withIV_seperated.h5")
-plot_anova_sum_sq_fraction(mu_dict, pn.figures.get() / "fig4_anova.jpg")
+# # The plotting data is copied from outputs
+# mu_dict = clt.io.read_pd_hdf5(pn.figures.data_for_plotting.get()/"anova_mu_fraction_withIV_seperated.h5")
+# for k, df in mu_dict.items():
+#     df.rename(columns=strip_C, inplace=True)
+# #mu_dict = clt.io.read_pd_hdf5(pn.figures.data_for_plotting.get()/"anova_mu_fraction_withIV_seperated.h5")
+# plot_anova_sum_sq_fraction(mu_dict, pn.figures.get() / "fig4_anova.jpg")
 
 
 df_Wi_regime_norm = pd.read_csv(pn.figures.data_for_plotting.get()/"df_Wi_regime_norm.csv", index_col=[0])
