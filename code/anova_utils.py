@@ -257,8 +257,8 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     # new_order = [0, 1, 5, 3, 4]  # Example: Custom order
     # reordered_colors = [cm(i) for i in new_order]
     #                   Pr, Cr, Co, IV, Error, interaction
-    reordered_colors = [cm(0), cm(1), cm(5), cm(3), "black", cm(4)]
-    vars_order = ["Pr", "Cr", "Co", "IV", "Error", "Interaction terms"]
+    reordered_colors = [cm(0), cm(1), cm(5), cm(3), cm(4)]
+    vars_order = ["Pr", "Cr", "Co", "IV", "Interaction terms"]
     def add_anova(ax, v, show_xticks=True):
         name = var_dict[v]
         mu = mu_dict[v][vars_order]
@@ -296,7 +296,7 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
         "Cr": "Crop price\nratio (Cr)",
         "Co": "Initial corn\nfield ratio (Co)",
         "IV": "Internal\nvariability",
-        "Error": "Model\nerror",
+        #"Error": "Model\nerror",
         "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
     fig.legend(handles, labels, ncols=len(vars_order), bbox_to_anchor=(0.48, -0.05), loc='upper center', frameon=False, fontsize=8)
