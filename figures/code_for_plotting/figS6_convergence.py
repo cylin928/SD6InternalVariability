@@ -122,6 +122,17 @@ ax.legend(
     bbox_to_anchor=(1.175, 0.5),
     )
 
+panel_labels = ["(a)", "(b)", "(c)"]
+
+for ax, label in zip(axes, panel_labels):
+    ax.text(
+        0.01, 0.98, label,
+        transform=ax.transAxes,
+        ha="left", va="top",
+        fontsize=12,
+        fontweight="bold"
+    )
+
 plt.tight_layout()
 plt.savefig(pn.figures.get() / "figS6_convergence_avg_all.jpg", dpi=300)
 plt.show()
@@ -172,6 +183,18 @@ fig.legend(
     alignment="left",
     bbox_to_anchor=(1.2, 0.5),
 )
+
+
+panel_labels = ["(a)", "(b)", "(c)"]
+
+for ax, label in zip(axes, panel_labels):
+    ax.text(
+        0.01, 0.98, label,
+        transform=ax.transAxes,
+        ha="left", va="top",
+        fontsize=12,
+        fontweight="bold"
+    )
 
 plt.tight_layout(rect=[0, 0.08, 1, 1])
 plt.savefig(pn.figures.get() / "figS6_convergence_nRe.jpg", dpi=300)
