@@ -51,6 +51,7 @@ def extract_oat(scen, exp_folder):
     df = df.iloc[1:, :]
     df = df.set_index("year")
     dff = df.mean()
+    
     number_list = [float(num) for num in re.findall(r"[+]?\d*\.\d+|\d+", scen)]
     columns = [
         "prec_ratio",
@@ -156,6 +157,19 @@ for seed in [1,2,67]:
 
 df_rank = sum(dfs_rank) / len(dfs_rank)
 df_si = sum(dfs_si) / len(dfs_si)
+
+rename_map = {
+    'Field ratio\nfor corn': 'Corn field\npercentage',
+    'Field ratio\nfor others': 'Other crop field\npercentage', 
+    'Behavioral\nstate changes': 'Behavioral state\nchange percentatge', 
+    'Rainfed\nfield ratio': 'Rainfed field\npercentage',
+    'Initial ratio of\ncorn fields': 'Initial corn field\npercentage'
+    }
+df_rank.rename(index=rename_map, inplace=True)
+df_rank.rename(columns=rename_map, inplace=True)
+df_si.rename(index=rename_map, inplace=True)
+df_si.rename(columns=rename_map, inplace=True)
+
 df_rank.to_csv(pn.figures.data_for_plotting.get()/"fig3_oat_df_rank.csv")
 df_si.to_csv(pn.figures.data_for_plotting.get()/"fig3_oat_df_si.csv")
 

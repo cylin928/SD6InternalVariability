@@ -597,10 +597,10 @@ class SD6Visual:
         ax = fig.add_axes([0, 1 / 4 * 2 + 1 / 4 / 3 * 2.5, 1, 1 / 4])
         axes.append(ax)
         plot_var_timeseries(
-            ax, var_, var_rescale=1, ylabel="Field ratio\nfor corn\n(--)"
+            ax, var_, var_rescale=100, ylabel="Corn field\npercentage\n(%)"
         )
 
-        ax.set_ylim([0, 1])
+        ax.set_ylim([0, 100])
         ax.set_xlabel("Year")
 
         ax.yaxis.set_label_coords(ylabel_xloc, 0.5)

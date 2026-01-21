@@ -30,14 +30,14 @@ medians = {
 hue_var_dict = {
     "Pr": "Prec ratio\n(Pr)",
     "Cr": "Crop price\nratio (Cr)",
-    "Co": "Initial corn\nfield ratio (Co)",
+    "Co": "Initial corn\nfield percentage (Co)",
     }
 
 y_var_dict = {
     "ST": "Saturated\nthickness\n(m)",
     "Wi": "Withdrawal\n($10^6 m^3$)",
-    "CF": "Field ratio\nfor corn\n(--)",
-    "CSC": "Behavioral\nstate changes\n(--)"
+    "CF": "Corn field\npercentage\n(%)",
+    "CSC": "Behavioral\nstate change\npercentage\n(%)"
     }
 
 
@@ -50,6 +50,8 @@ for i, y_var in enumerate(y_vars):
         ax = axes[i, j]
 
         df_subset = df_sys_all.copy()
+        df_subset[['RF','CF','OF']] *= 100
+        df_subset[['CSC']] /= 3.36
         for v in hue_vars:
             if v != hue_var:
                 df_subset = df_subset[np.isclose(df_subset[v], medians[v])]
@@ -73,14 +75,14 @@ for i, y_var in enumerate(y_vars):
         )
 
         if i == 0:
-            ax.set_title(f'{hue_var_dict[hue_var]}', fontsize=10)
+            ax.set_title(f'{hue_var_dict[hue_var]}', fontsize=14)
             ax.set_ylim([15, 22])
         if i == 1:
             ax.set_ylim([0, 40])
         if i == 2:
-            ax.set_ylim([0, 1.25])
+            ax.set_ylim([0, 100])
         if i == 3:
-            ax.set_ylim([0, 400])
+            ax.set_ylim([0, 100])
 
         if j == 0:
             ax.set_ylabel(f"{y_var_dict[y_var]}")

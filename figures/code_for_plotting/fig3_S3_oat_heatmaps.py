@@ -10,15 +10,21 @@ pn = pathnavigator.create(root_dir)
 df_rank = pd.read_csv(pn.figures.data_for_plotting.get()/"fig3_oat_df_rank.csv", index_col=[0])
 df_si = pd.read_csv(pn.figures.data_for_plotting.get()/"fig3_oat_df_si.csv", index_col=[0])
 
+rename_map = {}
+
 df_rank.index = [i.replace("\r", "") for i in df_rank.index]
 df_si.index = [i.replace("\r", "") for i in df_si.index]
 df_rank.columns = [i.replace("\r", "") for i in df_rank.columns]
 df_si.columns = [i.replace("\r", "") for i in df_si.columns]
+
+
+df_rank.columns
+rename_map = {'Field ratio\nfor corn'}
 #%% Figure 3 OAT heatmap
 factors_ = [
     "Precipitation",
     "Crop price",
-    "Initial ratio of\ncorn fields",
+    'Initial corn field\npercentage',
     'Initial well' + '\n' + 'characteristics',#'\n'+r'($\bar{B}$)',
     ]
 
@@ -26,7 +32,7 @@ factors_ = [
 fig, ax = plt.subplots(figsize=(3.7, 4.2))
 
 # Plot the heatmap
-sns.heatmap(
+hm = sns.heatmap(
     df_rank.T[factors_],
     annot=df_si.T[factors_],
     cmap="Oranges_r",# "Reds_r",
@@ -36,6 +42,10 @@ sns.heatmap(
     annot_kws={"fontsize": 9},#, "fontweight": "bold"},
     ax=ax,
 )
+
+cbar = hm.collections[0].colorbar
+cbar.set_label("Rank of importance", fontsize=11)
+cbar.ax.tick_params(labelsize=9)
 
 ax.collections[0].colorbar.ax.invert_yaxis()
 ax.tick_params(axis="x", labelrotation=90)
@@ -54,7 +64,7 @@ plt.show()
 factors_ = [
     "Precipitation",
     "Crop price",
-    "Initial ratio of\ncorn fields",
+    'Initial corn field\npercentage',
     r'Initial well' + '\n' + 'characteristics',#'\n'+r'($\bar{B}$)',
     "Electricity\nprice",
     "Aquifer\ndrawdown\nrate coef.",
@@ -64,7 +74,7 @@ factors_ = [
 fig, ax = plt.subplots(figsize=(5.91, 4.5))
 
 # Plot the heatmap
-sns.heatmap(
+hm = sns.heatmap(
     df_rank.T[factors_],
     annot=df_si.T[factors_],
     cmap="Oranges_r",# "Reds_r",
@@ -74,6 +84,10 @@ sns.heatmap(
     annot_kws={"fontsize": 9},#, "fontweight": "bold"},
     ax=ax,
 )
+
+cbar = hm.collections[0].colorbar
+cbar.set_label("Rank of importance", fontsize=11)
+cbar.ax.tick_params(labelsize=9)
 
 ax.collections[0].colorbar.ax.invert_yaxis()
 ax.tick_params(axis="x", labelrotation=90)

@@ -22,7 +22,24 @@ var_dict = {
     'CSC': 'Behavioral\nstate changes',
     'TP': 'Total\nprofit'
     }
-
+var_dict_revised = {
+    'ST': 'Saturated\nthickness',
+    'Wi': 'Withdrawal',
+    'RF': 'Rainfed\nfield ratio',
+    'CF': 'Corn field\npercentage',
+    'OF': 'Other crop field\npercentage',
+    'CSC': 'Behavioral state\nchange percentatge',
+    'TP': 'Total\nprofit'
+    }
+var_dict_revised2 = {
+    'ST': 'Saturated\nthickness',
+    'Wi': 'Withdrawal',
+    'RF': 'Rainfed\nfield ratio',
+    'CF': 'Corn field\npercentage',
+    'OF': 'Other crop field\npercentage',
+    'CSC': 'Behavioral\nstate change\npercentatge',
+    'TP': 'Total\nprofit'
+    }
 
 def anova_yr(y_out, df_sys_all, yr, seed=None, plot_residual=False, typ=1):
     """
@@ -260,17 +277,17 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     reordered_colors = [cm(0), cm(1), cm(5), cm(3), cm(4)]
     vars_order = ["Pr", "Cr", "Co", "IV", "Interaction terms"]
     def add_anova(ax, v, show_xticks=True):
-        name = var_dict[v]
+        name = var_dict_revised[v]
         mu = mu_dict[v][vars_order]
         mu.plot(kind='bar', stacked=True, ax=ax, width=0.7, legend=False, color=reordered_colors, edgecolor='dimgray')
-        ax.set_ylabel(name, fontsize=10)
+        ax.set_ylabel(name, fontsize=12)
         ax.set_ylim([0,1])
         ax.grid(True, axis='y', linestyle='--', alpha=0.5)
         if show_xticks is False:
             ax.set_xticklabels([])
         else:
-            ax.set_xlabel("Year", fontsize=10)
-
+            ax.set_xlabel("Year", fontsize=12)
+        ax.tick_params(axis='both', labelsize=12)
     def add_anova_mean(ax, v, show_xticks=True):
         mu = df_mean.loc[[v], vars_order]
         mu.index = ["Mean"]
@@ -281,6 +298,7 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
         ax.grid(True, axis='y', linestyle='--', alpha=0.5)
         if show_xticks is False:
             ax.set_xticklabels([])
+        ax.tick_params(axis='both', labelsize=12)
         # Remove all four spines (top, right, left, bottom)
         #for spine in ['top', 'right', 'left', 'bottom']:
         #    ax.spines[spine].set_visible(False)
@@ -294,12 +312,13 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     map_dict = {
         "Pr": "Prec ratio\n(Pr)",
         "Cr": "Crop price\nratio (Cr)",
-        "Co": "Initial corn\nfield ratio (Co)",
+        "Co": "Initial corn field\npercentage (Co)",
         "IV": "Internal\nvariability",
         #"Error": "Model\nerror",
         "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
-    fig.legend(handles, labels, ncols=len(vars_order), bbox_to_anchor=(0.48, -0.05), loc='upper center', frameon=False, fontsize=8)
+    fig.legend(handles, labels, ncols=len(vars_order), bbox_to_anchor=(0.48, -0.05), 
+               loc='upper center', frameon=False, fontsize=10)
     v = 'ST'
     ax = fig.add_subplot(gs[1, 0])
     add_anova(ax, v)
@@ -344,7 +363,7 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     ]
 
     for label, (x, y) in zip(labels, positions):
-        fig.text(x, y, label, fontsize=10, fontweight='bold', ha='left', va='top')
+        fig.text(x, y, label, fontsize=12, fontweight='bold', ha='left', va='top')
 
     # Show the plot
     fig.tight_layout(rect=[0, 0, 0.85, 1])
@@ -674,6 +693,7 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
         # Reverse the x-axis tick labels
         ax.set_xticks([-1, -0.5, 0, 0.5, 1])
         ax.set_xticklabels([1, 0.5, 0, 0.5, 1])
+        ax.tick_params(axis='both', labelsize=12)
 
         # Add labels at center line
         for i, v in enumerate(vlist):
@@ -703,9 +723,11 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     v_regime = "Wi_regime"
     df_lower, df_higher = get_df_higher_lower(v_regime)
     add_bars(ax, df_lower, df_higher)
-    ax.set_ylabel("Fraction of\nvariance explained", fontsize=10)
-    ax.set_xticklabels([var_dict[v] for v in df_lower.index])
-    ax.set_ylabel("Fraction of\nvariance explained", fontsize=10)
+    ax.set_ylabel("Fraction of\nvariance explained", fontsize=12)
+    ax.set_xticklabels([var_dict_revised2[v] for v in df_lower.index])
+    ax.set_ylabel("Fraction of\nvariance explained", fontsize=12)
+    # Tick labels (x and y)
+    ax.tick_params(axis='both', labelsize=10.5)
 
     ##### Second left subplot (bottom-left), share x-axis
     # ax = fig.add_subplot(gs[1, 0])
@@ -717,9 +739,11 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
 
     # Add legend
     handles, labels = ax.get_legend_handles_labels()
-    map_dict = {"Pr": "Prec ratio\n(Pr)", "Cr": "Crop price\nratio (Cr)", "Co": "Initial corn\nfield ratio (Co)", "Residual": "Internal\nvariability", "Interaction terms": "Interaction\nterms"}
+    map_dict = {"Pr": "Prec ratio\n(Pr)", "Cr": "Crop price\nratio (Cr)", 
+                "Co": "Initial corn field\n percentage (Co)", "Residual": "Internal\nvariability", "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
-    legend1 = fig.legend(handles, labels, ncols=5, bbox_to_anchor=(0.5, 0.03), loc='upper center', frameon=False, fontsize=8)
+    legend1 = fig.legend(handles, labels, ncols=5, bbox_to_anchor=(0.5, 0.05), loc='upper center', 
+                         frameon=False, fontsize=10)
     # Second legend: hatch styles
     hatch_lower = mpatches.Patch(facecolor='white', edgecolor='dimgray', hatch='//', label='Lower than\nhistorical values')
     hatch_higher = mpatches.Patch(facecolor='white', edgecolor='dimgray', hatch=None, label='Higher than\nhistorical values')
@@ -727,10 +751,10 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
         [hatch_higher, hatch_lower],
         ['Higher irrigation intensity', 'Lower irrigation intensity'],
         ncol=2,
-        bbox_to_anchor=(0.5, -0.1),
+        bbox_to_anchor=(0.5, -0.12),
         loc='upper center',
         frameon=False,
-        fontsize=8
+        fontsize=10
     )
 
     # Ensure both legends are added to the figure
@@ -740,8 +764,12 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     ##### Third right subplot (top-right)
     ax = fig.add_subplot(gs[0, 1])
     add_hbar(ax, df_Wi_regime_norm, reverse=False)
-    ax.set_xlabel('Normalized mean value')
-
+    ax.set_xlabel('Normalized mean value', fontsize=12)
+    ax.set_ylabel('Variable', fontsize=12)
+    
+    # Tick labels (x and y)
+    ax.tick_params(axis='both', labelsize=12)
+    
     ##### Forth right subplot (bottom-right)
     # ax = fig.add_subplot(gs[1, 1])
     # add_hbar(ax, df_ST_regime_norm, reverse=True, hatch_at="higher")
@@ -754,7 +782,7 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     ]
 
     for label, (x, y) in zip(labels, positions):
-        fig.text(x, y, label, fontsize=10, fontweight='bold', ha='left', va='top')
+        fig.text(x, y, label, fontsize=12, fontweight='bold', ha='left', va='top')
 
     #fig.text(-0.03, 0.78, "Withdrawal regime\ncomparison", fontsize=10, ha='center', va='center', rotation=90)
     #fig.text(-0.03, 0.32, "Saturated thickness\nregime comparison", fontsize=10, ha='center', va='center', rotation=90)

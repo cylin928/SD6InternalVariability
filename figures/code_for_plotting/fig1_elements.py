@@ -48,8 +48,8 @@ import pickle
 pn.code.chdir()
 from plotting import SD6Visual
 # Replace the path with the correct location of your .pkl file
-with open(pn.models.get('calibrated_model.pkl'), 'rb') as file:
-    m = pickle.load(file)
+# with open(pn.models.get('calibrated_model.pkl'), 'rb') as file:
+#     m = pickle.load(file)
 
 df_sys = pd.read_csv(pn.models.get() / "calibrated_model_df_sys.csv", index_col=[0])
 df_agt = pd.read_csv(pn.models.get() / "calibrated_model_df_agt.csv", index_col=[0])
