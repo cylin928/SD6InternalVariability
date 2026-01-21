@@ -597,7 +597,7 @@ class SD6Visual:
         ax = fig.add_axes([0, 1 / 4 * 2 + 1 / 4 / 3 * 2.5, 1, 1 / 4])
         axes.append(ax)
         plot_var_timeseries(
-            ax, var_, var_rescale=100, ylabel="Corn field\npercentage\n(%)"
+            ax, var_, var_rescale=100, ylabel="Corn percent\ncover\n(%)"
         )
 
         ax.set_ylim([0, 100])

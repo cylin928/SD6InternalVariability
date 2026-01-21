@@ -159,11 +159,11 @@ df_rank = sum(dfs_rank) / len(dfs_rank)
 df_si = sum(dfs_si) / len(dfs_si)
 
 rename_map = {
-    'Field ratio\nfor corn': 'Corn field\npercentage',
-    'Field ratio\nfor others': 'Other crop field\npercentage', 
+    'Field ratio\nfor corn': 'Corn percent\ncover',
+    'Field ratio\nfor others': 'Other crops\npercent cover', 
     'Behavioral\nstate changes': 'Behavioral state\nchange percentatge', 
-    'Rainfed\nfield ratio': 'Rainfed field\npercentage',
-    'Initial ratio of\ncorn fields': 'Initial corn field\npercentage'
+    'Rainfed\nfield ratio': 'Rainfed\npercent cover',
+    'Initial ratio of\ncorn fields': 'Initial corn\npercent cover'
     }
 df_rank.rename(index=rename_map, inplace=True)
 df_rank.rename(columns=rename_map, inplace=True)

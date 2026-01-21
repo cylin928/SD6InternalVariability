@@ -30,13 +30,13 @@ medians = {
 hue_var_dict = {
     "Pr": "Prec ratio\n(Pr)",
     "Cr": "Crop price\nratio (Cr)",
-    "Co": "Initial corn\nfield percentage (Co)",
+    "Co": "Initial corn\npercent cover (Co)",
     }
 
 y_var_dict = {
     "ST": "Saturated\nthickness\n(m)",
     "Wi": "Withdrawal\n($10^6 m^3$)",
-    "CF": "Corn field\npercentage\n(%)",
+    "CF": "Corn\npercent\ncover\n(%)",
     "CSC": "Behavioral\nstate change\npercentage\n(%)"
     }
 

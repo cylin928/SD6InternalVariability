@@ -25,18 +25,18 @@ var_dict = {
 var_dict_revised = {
     'ST': 'Saturated\nthickness',
     'Wi': 'Withdrawal',
-    'RF': 'Rainfed\nfield ratio',
-    'CF': 'Corn field\npercentage',
-    'OF': 'Other crop field\npercentage',
+    'RF': 'Rainfed\npercent cover',
+    'CF': 'Corn percent\ncover',
+    'OF': 'Other crops\npercent cover',
     'CSC': 'Behavioral state\nchange percentatge',
     'TP': 'Total\nprofit'
     }
 var_dict_revised2 = {
     'ST': 'Saturated\nthickness',
     'Wi': 'Withdrawal',
-    'RF': 'Rainfed\nfield ratio',
-    'CF': 'Corn field\npercentage',
-    'OF': 'Other crop field\npercentage',
+    'RF': 'Rainfed\npercent cover',
+    'CF': 'Corn\npercent\npercentage',
+    'OF': 'Other crops percent cover',
     'CSC': 'Behavioral\nstate change\npercentatge',
     'TP': 'Total\nprofit'
     }
@@ -312,7 +312,7 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     map_dict = {
         "Pr": "Prec ratio\n(Pr)",
         "Cr": "Crop price\nratio (Cr)",
-        "Co": "Initial corn field\npercentage (Co)",
+        "Co": "Initial corn\npercent cover (Co)",
         "IV": "Internal\nvariability",
         #"Error": "Model\nerror",
         "Interaction terms": "Interaction\nterms"}
@@ -344,8 +344,8 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     add_anova_mean(ax, v)
 
     # Add section titles (in place of axes[0/1].set_title)
-    fig.text(0.11, 0.99, "Policy-relevant indicator", fontsize=12, va='top', ha='left')
-    fig.text(0.534, 0.99, "Human behavioral variable", fontsize=12, va='top', ha='left')
+    fig.text(0.15, 0.99, "Policy-relevant indicator", fontsize=12, va='top', ha='left')
+    fig.text(0.585, 0.99, "Human behavioral variable", fontsize=12, va='top', ha='left')
     fig.text(-0.02, 0.5, "Fraction of variance explained", va='center', ha='center',
              rotation='vertical', fontsize=12)
 
@@ -699,9 +699,9 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
         for i, v in enumerate(vlist):
             # Label for lower (left side)
             if reverse:
-                ax.text(0.02, y[i], var_dict[v], va='center', ha='left', fontsize=7)
+                ax.text(0.02, y[i], var_dict[v], va='center', ha='left', fontsize=9)
             else:
-                ax.text(-0.02, y[i], var_dict[v], va='center', ha='right', fontsize=7)
+                ax.text(-0.02, y[i], var_dict[v], va='center', ha='right', fontsize=9)
 
         # Aesthetics
         ax.set_yticks([])
@@ -740,7 +740,7 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     # Add legend
     handles, labels = ax.get_legend_handles_labels()
     map_dict = {"Pr": "Prec ratio\n(Pr)", "Cr": "Crop price\nratio (Cr)", 
-                "Co": "Initial corn field\n percentage (Co)", "Residual": "Internal\nvariability", "Interaction terms": "Interaction\nterms"}
+                "Co": "Initial corn\npercent cover (Co)", "Residual": "Internal\nvariability", "Interaction terms": "Interaction\nterms"}
     labels = [map_dict[i] if map_dict.get(i) is not None else i for i in labels]
     legend1 = fig.legend(handles, labels, ncols=5, bbox_to_anchor=(0.5, 0.05), loc='upper center', 
                          frameon=False, fontsize=10)
@@ -764,11 +764,11 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
     ##### Third right subplot (top-right)
     ax = fig.add_subplot(gs[0, 1])
     add_hbar(ax, df_Wi_regime_norm, reverse=False)
-    ax.set_xlabel('Normalized mean value', fontsize=12)
+    ax.set_xlabel('Normalized mean value', fontsize=10)
     ax.set_ylabel('Variable', fontsize=12)
     
     # Tick labels (x and y)
-    ax.tick_params(axis='both', labelsize=12)
+    ax.tick_params(axis='both', labelsize=10)
     
     ##### Forth right subplot (bottom-right)
     # ax = fig.add_subplot(gs[1, 1])

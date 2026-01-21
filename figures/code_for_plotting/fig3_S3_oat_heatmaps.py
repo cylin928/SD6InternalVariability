@@ -19,12 +19,11 @@ df_si.columns = [i.replace("\r", "") for i in df_si.columns]
 
 
 df_rank.columns
-rename_map = {'Field ratio\nfor corn'}
 #%% Figure 3 OAT heatmap
 factors_ = [
     "Precipitation",
     "Crop price",
-    'Initial corn field\npercentage',
+    'Initial corn\npercent cover',
     'Initial well' + '\n' + 'characteristics',#'\n'+r'($\bar{B}$)',
     ]
 
@@ -64,7 +63,7 @@ plt.show()
 factors_ = [
     "Precipitation",
     "Crop price",
-    'Initial corn field\npercentage',
+    'Initial corn\npercent cover',
     r'Initial well' + '\n' + 'characteristics',#'\n'+r'($\bar{B}$)',
     "Electricity\nprice",
     "Aquifer\ndrawdown\nrate coef.",
