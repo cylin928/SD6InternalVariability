@@ -16,10 +16,10 @@ vlist = ['ST', 'CF', 'Wi', 'CSC']
 var_dict = {
     'ST': 'Saturated\nthickness',
     'Wi': 'Withdrawal',
-    'RF': 'Rainfed\nfield ratio',
-    'CF': 'Field ratio\nfor corn',
-    'OF': 'Field ratio\nfor others',
-    'CSC': 'Behavioral\nstate changes',
+    'RF': 'Rainfed\npercent cover',
+    'CF': 'Corn percent\ncover',
+    'OF': 'Other crops\npercent cover',
+    'CSC': 'Behavioral state\nchange percentage',
     'TP': 'Total\nprofit'
     }
 #%%
