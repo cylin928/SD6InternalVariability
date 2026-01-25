@@ -35,9 +35,19 @@ var_dict_revised2 = {
     'ST': 'Saturated\nthickness',
     'Wi': 'Withdrawal',
     'RF': 'Rainfed\npercent cover',
-    'CF': 'Corn\npercent\npercentage',
+    'CF': 'Corn\npercent\ncover',
     'OF': 'Other crops percent cover',
     'CSC': 'Behavioral\nstate change\npercentatge',
+    'TP': 'Total\nprofit'
+    }
+
+var_dict_revised3 = {
+    'ST': 'Saturated\nthickness',
+    'Wi': 'Withdrawal',
+    'RF': 'Rainfed\npercent cover',
+    'CF': 'Corn percent\ncover',
+    'OF': 'Other crops percent cover',
+    'CSC': 'Behavioral\nstate change %',
     'TP': 'Total\nprofit'
     }
 
@@ -344,9 +354,9 @@ def plot_anova_sum_sq_fraction(mu_dict, save_figname=None):
     add_anova_mean(ax, v)
 
     # Add section titles (in place of axes[0/1].set_title)
-    fig.text(0.15, 0.99, "Policy-relevant indicator", fontsize=12, va='top', ha='left')
-    fig.text(0.585, 0.99, "Human behavioral variable", fontsize=12, va='top', ha='left')
-    fig.text(-0.02, 0.5, "Fraction of variance explained", va='center', ha='center',
+    fig.text(0.122, 0.99, "Policy-relevant indicator", fontsize=12, va='top', ha='left')
+    fig.text(0.581, 0.99, "Human behavioral variable", fontsize=12, va='top', ha='left')
+    fig.text(-0.05, 0.5, "Fraction of variance explained", va='center', ha='center',
              rotation='vertical', fontsize=12)
 
     labels = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)']
@@ -699,9 +709,9 @@ def plot_norm_comparison(pn, df_Wi_regime_norm, fraction=True, save_figname=None
         for i, v in enumerate(vlist):
             # Label for lower (left side)
             if reverse:
-                ax.text(0.02, y[i], var_dict[v], va='center', ha='left', fontsize=9)
+                ax.text(0.02, y[i], var_dict_revised3[v], va='center', ha='left', fontsize=9)
             else:
-                ax.text(-0.02, y[i], var_dict[v], va='center', ha='right', fontsize=9)
+                ax.text(-0.02, y[i], var_dict_revised3[v], va='center', ha='right', fontsize=9)
 
         # Aesthetics
         ax.set_yticks([])

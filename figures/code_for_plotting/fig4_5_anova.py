@@ -2,7 +2,10 @@ import pandas as pd
 import pathnavigator
 import clt
 
-root_dir = rf"C:\Users\{pathnavigator.user}\Documents\GitHub\SD6InternalVariability"
+if pathnavigator.os_name == 'Darwin':
+    root_dir = rf"/Users/{pathnavigator.user}/Documents/GitHub/SD6InternalVariability"
+else:
+    root_dir = rf"C:\Users\{pathnavigator.user}\Documents\GitHub\SD6InternalVariability"
 pn = pathnavigator.create(root_dir)
 pn.code.chdir()
 

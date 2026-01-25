@@ -145,7 +145,10 @@ axes = axes.flatten()
 handles, labels = None, None
 
 for ax, v in zip(axes, vlist):
-    df = nRe_iv_dict[v].copy()
+    if v in ["CSC", "CF"]:
+        df = nRe_iv_dict[v].copy()*100
+    else:
+        df = nRe_iv_dict[v].copy()
 
     # keep only 2013–2022 and ensure year index is integer
     df.index = df.index.astype(int)
@@ -195,8 +198,10 @@ axes = axes.flatten()
 handles, labels = None, None
 
 for ax, v in zip(axes, vlist):
-    df = nCd_iv_dict[v].copy()
-
+    if v in ["CSC", "CF"]:
+        df = nCd_iv_dict[v].copy()*100
+    else:
+        df = nCd_iv_dict[v].copy()
     # keep only 2013–2022 and ensure year index is integer
     df.index = df.index.astype(int)
     df = df.loc[(df.index >= 2013) & (df.index <= 2022)]
@@ -245,7 +250,10 @@ axes = axes.flatten()
 handles, labels = None, None
 
 for ax, v in zip(axes, vlist):
-    df = seeds_iv_dict[v].copy()
+    if v in ["CSC", "CF"]:
+        df = seeds_iv_dict[v].copy()*100
+    else:
+        df = seeds_iv_dict[v].copy()
 
     # keep only 2013–2022 and ensure year index is integer
     df.index = df.index.astype(int)
