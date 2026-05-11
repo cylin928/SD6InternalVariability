@@ -1,91 +1,64 @@
+
 import os
+import sys
+import dill
 import numpy as np
+import pandas as pd
+import pathnavigator
+sys.setrecursionlimit(10000)  # Set to a higher value for dill deep dict.
+root_dir = rf"/Users/{pathnavigator.user}/Documents/GitHub/SD6InternalVariability"
+pn = pathnavigator.create(root_dir)
+pn.code.chdir()
 from py_champ.utility.util import TimeRecorder
 from py_champ.models.particle_swarm import GlobalBestPSO
+from py_champ.models.sd6_model_1f1w import SD6Model4SingleFieldAndWell
+from utils import (
+    load_x_from_cali_txt_output,
+    cal_rmse_metrices_cali, 
+    cal_weighted_rmse, 
+    normalize_st_withdrawal, 
+    update_model_inputs_from_cali_x
+    )
 
+# Set shortcut
+pn.inputs.set_sc("input_pkl", "Inputs_SD6_2012_2022.pkl")
+pn.data.set_sc("sd6_data", "Data_SD6_2012_2022.csv")
 
-def obj_func(x, seeds, exp_dir, **kwargs):
-    # Need to be placed here to use dill in joblib
+# Load inputs
+with open(pn.sc.input_pkl, "rb") as f:
+    inputs = dill.load(f)
+
+# Load sd6 data
+sd6_data = pd.read_csv(pn.sc.sd6_data, index_col=["year"]).loc[2012:2019, :]
+sd6_data = normalize_st_withdrawal(sd6_data)
+
+def run_simulation(x, seeds, inputs, sd6_data, exp_dir, **kwargs):
     import os
     import sys
-    import dill
     import numpy as np
-    import pandas as pd
-    from py_champ.models.sd6_model_1f1w import SD6Model4SingleFieldAndWell
-
+    import pathnavigator
     sys.setrecursionlimit(10000)  # Set to a higher value for dill deep dict.
-    wd = rf"C:/Users/{os.getlogin()}/Documents/GitHub/SD6InternalVariability"
-    if wd not in sys.path:
-        sys.path.append(os.path.join(wd, "code"))
-
-    from utils import ProjPaths
-
-    # Add file paths
-    paths = ProjPaths(wd)
-
-    # Add a custom path to save the experiment outputs (e.g., models, results)
-    paths.add_other_path("exp_dir", exp_dir)
-
-    init_year = 2011
-    paths.add_file(f"Inputs_SD6_{init_year+1}_2022.pkl", "inputs", "input_pkl")
-    paths.add_file(f"prec_avg_{init_year}_2022.csv", "data", "prec_avg")
-    paths.add_file(f"Data_SD6_{init_year+1}_2022.csv", "data", "sd6_data")
-
-    # Load inputs
-    with open(paths.input_pkl, "rb") as f:
-        (
-            aquifers_dict,
-            fields_dict,
-            wells_dict,
-            finances_dict,
-            behaviors_dict,
-            prec_aw_step,
-            crop_price_step,
-        ) = dill.load(f)
-
-    cali_years = 7
-    warmup_years = 2  # 2011-2012
-
-    ### Load observation data
-    sd6_data = pd.read_csv(paths.sd6_data, index_col=["year"])
-    # Normalize GW_st withdrawal to [0, 1] according to obv
-    sd6_data["GW_st"] = (sd6_data["GW_st"] - 17.5577) / (18.2131 - 17.5577)
-    sd6_data["withdrawal"] = (sd6_data["withdrawal"] - 1310.6749) / (
-        3432.4528 - 1310.6749
-    )
-    sd6_data = sd6_data.loc[
-        init_year + warmup_years : init_year + warmup_years + cali_years - 1
-    ]
-
+    root_dir = rf"/Users/{pathnavigator.user}/Documents/GitHub/SD6InternalVariability"
+    pn = pathnavigator.create(root_dir)
+    pn.code.chdir()
+    pn.code.add_to_sys_path()
+    from py_champ.models.sd6_model_1f1w import SD6Model4SingleFieldAndWell
+    from utils import (
+        cal_rmse_metrices_cali, 
+        normalize_st_withdrawal, 
+        update_model_inputs_from_cali_x,
+        cal_weighted_rmse
+        )
+    # Prepare variables for simulation
     crop_options = ["corn", "others"]
+    init_year = 2011
+    #seed = 67
 
-    ### Read PSO variables
-    i_iter = kwargs.get("i_iter")
-    i_particle = kwargs.get("i_particle")
-
-    ### Setup calibrated parameters
-    for fid in fields_dict:
-        fields_dict[fid]["water_yield_curves"]["others"] = [
-            x[0],
-            x[1],
-            x[2],
-            x[3],
-            x[4],
-            0.1186,
-        ]
-    for yr in crop_price_step["finance"]:
-        crop_price_step["finance"][yr]["others"] *= x[5]
-
-    pars = {
-        "perceived_risk": x[6],
-        "forecast_trust": x[7],
-        "sa_thre": x[8],
-        "un_thre": x[9],
-    }
-
-    rmse_list = []
-    for seed in seeds:
-        try:
+    (aquifers_dict, fields_dict, wells_dict, finances_dict, behaviors_dict, prec_aw_step, crop_price_step) = inputs
+    fields_dict, crop_price_step, pars = update_model_inputs_from_cali_x(x, fields_dict, crop_price_step)
+    try:
+        rmse_list = []
+        for seed in seeds:
             m = SD6Model4SingleFieldAndWell(
                 pars=pars,
                 crop_options=crop_options,
@@ -100,71 +73,59 @@ def obj_func(x, seeds, exp_dir, **kwargs):
                 end_year=2022,
                 lema_options=(True, "wr_LEMA_5yr", 2013),
                 show_step=False,
+                show_initialization=False,
                 seed=seed,
+                gurobi_dict = {"LogToConsole": 0, "NonConvex": 2, "Presolve": -1}
             )
 
-            m.particles = x
-            for _ in range(cali_years + warmup_years - 1):  # 2011-2019
+            for i in range(8):
                 m.step()
-            m.end()  # despose gurobi env
-
-            # Output dfs
+            m.end()
             df_sys, _ = m.get_dfs(m)
-
+            
             # Normalize GW_st withdrawal to [0, 1] according to obv (i.e., data)
-            df_sys = df_sys.loc[init_year + warmup_years :]
-            df_sys["GW_st"] = (df_sys["GW_st"] - 17.5577) / (18.2131 - 17.5577)
-            df_sys["withdrawal"] = (df_sys["withdrawal"] - 1310.6749) / (
-                3432.4528 - 1310.6749
-            )
-
+            df_sys = normalize_st_withdrawal(df_sys)
+            
             # Calculate metrices
-            metrices = m.get_metrices(df_sys, sd6_data)
-
-            # Calculate obj
-            rmse_sys = metrices.loc[["GW_st", "withdrawal"], "rmse"].mean()
-            rmse_crop = metrices.loc[crop_options, "rmse"].mean()
-            rmse = (rmse_sys + rmse_crop) / 2
-            m.rmse = rmse
-            # Save the model
-            with open(
-                os.path.join(
-                    exp_dir,
-                    f"{int(round(rmse,5)*1e5)}_it{i_iter}_ip{i_particle}_s{seed}.pkl",
-                ),
-                "wb",
-            ) as f:
-                dill.dump(m, f)
-        except Exception as e:
-            error_message = str(e)
-            print(f"An error occurred: {error_message}")
-            rmse = 99.99999  # error indicator
-
-        rmse_list.append(rmse)
-        # Clear model to reduce memory requirement
-        m = None
-
-    # Save the best model
-    cost = min(rmse_list)
-    seed = seeds[int(np.argmin(rmse_list))]
-    with open(
-        os.path.join(
-            paths.exp_dir,
-            f"{int(round(cost,5)*1e5)}_it{i_iter}_ip{i_particle}_s{seed}.txt",
-        ),
-        "w",
-    ) as f:
-        f.write(f"it{i_iter}_ip{i_particle}_s{seed}\nRMSE: {cost}\nx: {x}")
-
-    return cost
-
-
-# %% Setup PSO
+            metrices_cali = cal_rmse_metrices_cali(df_sys, sd6_data)
+            
+            # Calculate weighted RMSE
+            rmse_weighted = cal_weighted_rmse(metrices_cali)["cali"]
+            rmse_list.append(rmse_weighted)
+            
+            # Save memory
+            m = None
+        
+        best_rmse = min(rmse_list)    
+        mean_rmse = np.mean(rmse_list)
+        median_rmse = np.median(rmse_list)
+        
+        # Save the best model based on median rmse
+        ### Read PSO variables
+        i_iter = kwargs.get("i_iter")
+        i_particle = kwargs.get("i_particle")
+        seed_best = seeds[int(np.argmin(rmse_list))] # not the median rmse, but the best rmse among seeds for this par set, to save the model.
+        with open(
+            os.path.join(
+                exp_dir, "log",
+                f"{int(round(median_rmse,5)*1e5)}_it{i_iter}_ip{i_particle}_s{seed_best}.txt",
+            ),
+            "w",
+        ) as f:
+            f.write(f"it{i_iter}_ip{i_particle}_s{seed_best}\nMedian RMSE: {median_rmse}\nMean RMSE: {mean_rmse}\nBest RMSE: {best_rmse}\nRMSE List: {rmse_list}\nx: {x}")
+        return median_rmse
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        return 100
+#%% Run multiple seeds
+# Setup PSO
 # =============================================================================
 # General settings
 # =============================================================================
-exp_dir = r"D:\SD6_exp_1f1w\sd6_cali"
-os.chdir(exp_dir)
+pn.outputs.mkdir("sd6_cali2")
+pn.outputs.mkdir("sd6_cali2/log")
+exp_dir = str(pn.outputs.get("sd6_cali2"))
 
 # Info
 n_particles = 24
@@ -190,11 +151,14 @@ upperbounds = [
     0.5,
 ]  # [1]*4
 
-rngen = np.random.default_rng(seed=12345)
+rngen = np.random.default_rng(seed=39753) # 12345
 init_pos = rngen.uniform(0, 1, (n_particles, dimensions))
 for i in range(dimensions):
     init_pos[:, i] = init_pos[:, i] * (upperbounds[i] - lowerbounds[i]) + lowerbounds[i]
 # %%
+with open(pn.outputs.sd6_cali2.get("PSO_it70.pkl"), "rb") as f:
+    load_dict = dill.load(f)
+
 # Initialize PSO
 optimizer = GlobalBestPSO(
     n_particles=n_particles,
@@ -203,18 +167,30 @@ optimizer = GlobalBestPSO(
     bounds=(lowerbounds, upperbounds),
     init_pos=init_pos,
     wd=exp_dir,
+    load_dict=load_dict
 )
 
 # N = 5
 # rng = np.random.default_rng(12345)
 # seeds = [int(rng.integers(low=0, high=999999)) for _ in range(N)]
-seeds = [3, 56, 67]
+seeds = [3, 56, 67, 89, 123]
 # Run PSO
 timer = TimeRecorder()
 cost, pos = optimizer.optimize(
-    obj_func, iters=100, n_processes=8, verbose=60, seeds=seeds, exp_dir=exp_dir
+    run_simulation, iters=100, n_processes=8, verbose=60, seeds=seeds, inputs=inputs, sd6_data=sd6_data, exp_dir=exp_dir
 )
 
 print("\a")
 elapsed_time = timer.get_elapsed_time()
 print(elapsed_time)
+# %% Analysis
+# with open(pn.outputs.sd6_cali2.get("PSO_it100.pkl"), "rb") as f:
+#     load_dict = dill.load(f)
+
+# sw = load_dict["swarm"]
+# best_pos = sw.best_pos
+# See run_multiple_seeds_on_a_given_par_set.py
+
+
+
+

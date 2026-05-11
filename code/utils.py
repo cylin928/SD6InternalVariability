@@ -867,3 +867,88 @@ def cal_sobol_indices(
     df_s12[(df_s12 < 0) & (df_s12 >= zero_thres)] = 0
     df_st[(df_st < 0) & (df_st >= zero_thres)] = 0
     return df_s12.T, df_st.T
+
+def cal_rmse_metrices(df_sys, sd6_data):
+    """Calculate the RMSE metrices for the df_sys results of a scenario compared to the sd6_data."""
+    def _calc_rmse_metrices(df_sim: pd.DataFrame, df_obs: pd.DataFrame) -> pd.DataFrame:
+        common_index = df_sim.index.intersection(df_obs.index)
+        common_columns = df_sim.columns.intersection(df_obs.columns)
+
+        if len(common_index) == 0 or len(common_columns) == 0:
+            return pd.DataFrame(columns=["rmse"])
+
+        diff = df_sim.loc[common_index, common_columns] - df_obs.loc[
+            common_index, common_columns
+        ]
+        rmse = np.sqrt((diff**2).mean(axis=0))
+        return rmse.to_frame(name="rmse")
+
+    metrices_all = _calc_rmse_metrices(df_sys, sd6_data)
+    metrices_cali = _calc_rmse_metrices(
+        df_sys.loc[2012:2019, :], sd6_data.loc[2012:2019, :]
+    )
+    metrices_vali = _calc_rmse_metrices(
+        df_sys.loc[2019:2022, :], sd6_data.loc[2019:2022, :]
+    )
+    metrices = pd.concat([metrices_all, metrices_cali, metrices_vali], axis=1, keys=["all", "cali", "vali"])
+    metrices.columns = metrices.columns.droplevel(1)
+    return metrices
+
+def cal_rmse_metrices_cali(df_sys, sd6_data):
+    """Calculate the RMSE metrices for the df_sys results of a scenario compared to the sd6_data."""
+    def _calc_rmse_metrices(df_sim: pd.DataFrame, df_obs: pd.DataFrame) -> pd.DataFrame:
+        common_index = df_sim.index.intersection(df_obs.index)
+        common_columns = df_sim.columns.intersection(df_obs.columns)
+
+        if len(common_index) == 0 or len(common_columns) == 0:
+            return pd.DataFrame(columns=["rmse"])
+
+        diff = df_sim.loc[common_index, common_columns] - df_obs.loc[
+            common_index, common_columns
+        ]
+        rmse = np.sqrt((diff**2).mean(axis=0))
+        return rmse.to_frame(name="rmse")
+
+    metrices_cali = _calc_rmse_metrices(
+        df_sys.loc[2012:2019, :], sd6_data.loc[2012:2019, :]
+    )
+    metrices_cali.columns = ["cali"]
+    return metrices_cali
+
+def cal_weighted_rmse(metrices, crop_options=["corn", "others"]):
+    """Calculate the weighted RMSE for the df_sys results of a scenario compared to the sd6_data."""
+    rmse_sys = metrices.loc[["GW_st", "withdrawal"], :].mean(axis=0)
+    rmse_crop = metrices.loc[crop_options, :].mean(axis=0)
+    rmse_weighted = 0.5 * rmse_sys + 0.5 * rmse_crop
+    return rmse_weighted
+
+def normalize_st_withdrawal(df):
+    """Normalize the GW_st and withdrawal columns in df to [0, 1] for rmse calculation."""
+    df = df.copy()
+    df = df.loc[2012 :]
+    df["GW_st"] = (df["GW_st"] - 17.5577) / (18.2131 - 17.5577)
+    df["withdrawal"] = (df["withdrawal"] - 1310.6749) / (
+        3432.4528 - 1310.6749
+    )
+    return df
+
+def update_model_inputs_from_cali_x(x, fields_dict, crop_price_step):
+    """Update the model inputs based on the calibrated parameters."""
+    for fid in fields_dict:
+        fields_dict[fid]["water_yield_curves"]["others"] = [
+            x[0],
+            x[1],
+            x[2],
+            x[3],
+            x[4],
+            0.1186,
+        ]
+    for yr in crop_price_step["finance"]:
+        crop_price_step["finance"][yr]["others"] *= x[5]
+    pars = {
+        "perceived_risk": x[6],
+        "forecast_trust": x[7],
+        "sa_thre": x[8],
+        "un_thre": x[9],
+    }
+    return fields_dict, crop_price_step, pars
