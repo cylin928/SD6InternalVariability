@@ -214,6 +214,15 @@ if not fitness_df.empty:
 else:
     print("No fitness rows found in met_all.")
 
+
+fitness_plot_df = fitness_df.iloc[:, :3].copy()
+summary_stats = pd.DataFrame({
+    "Median RMSE": fitness_plot_df.median(),
+    "IQR": fitness_plot_df.quantile(0.75) - fitness_plot_df.quantile(0.25),
+    "Std": fitness_plot_df.std()
+}).round(3)
+
+print(summary_stats)
 ###############################################################################
 #%% RMSE of the final calibrated model spread
 pn.outputs.mkdir("run_multiple_seeds_on_cali_x_median")
